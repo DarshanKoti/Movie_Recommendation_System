@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/png" href="video-editing-app.png">
+    <title>Cinephile Junction | Authentication</title>
+    <style>
+         body {
+            font-family: 'Roboto', Arial, sans-serif;
+            background-color: #121212;
+            color: #e0e0e0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .auth-container {
+            background-color: #1e1e1e;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            box-sizing: border-box;
+        }
+
+        .role-selector {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .role-btn {
+            padding: 8px 16px;
+            border: 2px solid #00bcd4;
+            background: none;
+            color: #00bcd4;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .role-btn.active {
+            background-color: #00bcd4;
+            color: white;
+        }
+
+        .auth-title {
+            text-align: center;
+            color: #00bcd4;
+            margin-bottom: 30px;
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #00bcd4;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background-color: #333;
+            color: #e0e0e0;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        .admin-code {
+            display: none;
+        }
+
+        .form-group input:focus {
+            border-color: #00bcd4;
+            outline: none;
+        }
+
+        .auth-button {
+            background-color: #00bcd4;
+            color: #fff;
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-weight: 600;
+            transition: background-color 0.3s ease;
+        }
+
+        .auth-button:hover {
+            background-color: #0097a7;
+        }
+
+        .toggle-link {
+            text-align: center;
+            margin-top: 20px;
+            color: #777;
+        }
+
+        .toggle-link a {
+            color: #00bcd4;
+            text-decoration: none;
+            font-weight: bold;
+        }
+
+        .error-message {
+            color: #ff4444;
+            text-align: center;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #00bcd4;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    
+    <!-- Add the loading overlay -->
+    <div id="loading-overlay">
+        <div class="spinner"></div>
+    </div>
+
+    <div class="auth-container">
+        <h2 id="authTitle" class="auth-title">Login</h2>
+    
+        <div class="role-selector">
+            <button class="role-btn active" data-role="user">User</button>
+            <button class="role-btn" data-role="admin">Admin</button>
+        </div>
+    
+        <div id="loginSection">
+            <div id="loginError" class="error-message"></div>
+            <form id="loginForm" class="auth-form">
+                <div class="form-group">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Password</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <div class="form-group admin-code">
+                    <label for="loginAdminCode">Admin Code</label>
+                    <input type="password" id="loginAdminCode">
+                </div>
+                <button type="submit" class="auth-button">Log In</button>
+            </form>
+            <div class="toggle-link">
+                Don't have an account? <a href="#" id="showSignup">Sign Up</a>
+            </div>
+        </div>
+    
+        <div id="signupSection" style="display: none;">
+            <div id="signupError" class="error-message"></div>
+            <form id="signupForm" class="auth-form">
+                <div class="form-group">
+                    <label for="signupName">Full Name</label>
+                    <input type="text" id="signupName" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupEmail">Email</label>
+                    <input type="email" id="signupEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="signupPassword">Password</label>
+                    <input type="password" id="signupPassword" required minlength="8">
+                </div>
+                <div class="form-group">
+                    <label for="confirmPassword">Confirm Password</label>
+                    <input type="password" id="confirmPassword" required>
+                </div>
+                <div class="form-group admin-code">
+                    <label for="signupAdminCode">Admin Code</label>
+                    <input type="password" id="signupAdminCode">
+                </div>
+                <button type="submit" class="auth-button">Create Account</button>
+            </form>
+            <div class="toggle-link">
+                Already have an account? <a href="#" id="showLogin">Login</a>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const ADMIN_SECRET_CODE = 'ADMIN123';
+        let users = JSON.parse(localStorage.getItem('users')) || [];
+        const loadingOverlay = document.getElementById('loading-overlay');
+        let currentRole = 'user';
+        
+        const authTitle = document.getElementById('authTitle');
+        const loginSection = document.getElementById('loginSection');
+        const signupSection = document.getElementById('signupSection');
+        const roleButtons = document.querySelectorAll('.role-btn');
+        
+        // Role selector functionality remains the same
+        roleButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                roleButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                currentRole = button.dataset.role;
+        
+                document.querySelectorAll('.admin-code').forEach(field => {
+                    field.style.display = currentRole === 'admin' ? 'block' : 'none';
+                });
+            });
+        });
+        
+        function showLoading() {
+            loadingOverlay.style.display = 'flex';
+        }
+        
+        function hideLoading() {
+            loadingOverlay.style.display = 'none';
+        }
+        
+        function redirectBasedOnRole(role) {
+            const basePath = window.location.origin;
+            if (role === 'admin') {
+                window.location.href = basePath + '/admin.html';
+            } else {
+                window.location.href = basePath + '/main.html';
+            }
+        }
+        
+        // Toggle between Login and Sign Up forms remains the same
+        document.getElementById('showSignup').addEventListener('click', function (e) {
+            e.preventDefault();
+            loginSection.style.display = 'none';
+            signupSection.style.display = 'block';
+            authTitle.textContent = 'Sign Up';
+        });
+        
+        document.getElementById('showLogin').addEventListener('click', function (e) {
+            e.preventDefault();
+            signupSection.style.display = 'none';
+            loginSection.style.display = 'block';
+            authTitle.textContent = 'Login';
+        });
+        
+        // Update the signup form submission handler
+document.getElementById('signupForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const name = document.getElementById('signupName').value;
+    const email = document.getElementById('signupEmail').value;
+    const password = document.getElementById('signupPassword').value;
+    const confirmPassword = document.getElementById('confirmPassword').value;
+    const adminCode = document.getElementById('signupAdminCode').value;
+    const signupError = document.getElementById('signupError');
+
+    signupError.style.display = 'none';
+
+    if (password !== confirmPassword) {
+        signupError.textContent = 'Passwords do not match';
+        signupError.style.display = 'block';
+        return;
+    }
+
+    if (users.some(user => user.email === email)) {
+        signupError.textContent = 'Email already registered';
+        signupError.style.display = 'block';
+        return;
+    }
+
+    if (currentRole === 'admin' && adminCode !== ADMIN_SECRET_CODE) {
+        signupError.textContent = 'Invalid admin code';
+        signupError.style.display = 'block';
+        return;
+    }
+
+    showLoading();
+    
+    // Create new user with additional details
+    const newUser = {
+        username: name,
+        name: name,
+        email: email,
+        password: password,
+        role: currentRole,
+        signUpDate: new Date().toISOString(),
+        lastLogin: new Date().toISOString(),
+        status: 'active'
+    };
+
+    users.push(newUser);
+    localStorage.setItem('users', JSON.stringify(users));
+    localStorage.setItem('currentUser', JSON.stringify({ 
+        name: name,
+        role: currentRole,
+        lastLogin: new Date().toISOString()
+    }));
+    localStorage.setItem('username', name);
+    
+    setTimeout(() => {
+        hideLoading();
+        redirectBasedOnRole(currentRole);
+    }, 1500);
+});
+
+// Update the login form submission handler
+document.getElementById('loginForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+
+    const email = document.getElementById('loginEmail').value;
+    const password = document.getElementById('loginPassword').value;
+    const adminCode = document.getElementById('loginAdminCode').value;
+    const loginError = document.getElementById('loginError');
+
+    loginError.style.display = 'none';
+
+    const user = users.find(u => u.email === email && u.password === password);
+
+    if (!user) {
+        loginError.textContent = 'Invalid email or password';
+        loginError.style.display = 'block';
+        return;
+    }
+
+    if (currentRole === 'admin') {
+        if (user.role !== 'admin') {
+            loginError.textContent = 'This account does not have admin privileges';
+            loginError.style.display = 'block';
+            return;
+        }
+        if (adminCode !== ADMIN_SECRET_CODE) {
+            loginError.textContent = 'Invalid admin code';
+            loginError.style.display = 'block';
+            return;
+        }
+    }
+
+    showLoading();
+    
+    // Update user's last login time
+    const updatedUsers = users.map(u => {
+        if (u.email === email) {
+            return {
+                ...u,
+                lastLogin: new Date().toISOString()
+            };
+        }
+        return u;
+    });
+    
+    localStorage.setItem('users', JSON.stringify(updatedUsers));
+    localStorage.setItem('currentUser', JSON.stringify({ 
+        name: user.name,
+        role: user.role,
+        lastLogin: new Date().toISOString()
+    }));
+    localStorage.setItem('username', user.name);
+    
+    setTimeout(() => {
+        hideLoading();
+        redirectBasedOnRole(user.role);
+    }, 1500);
+});
+    </script>
+</body>
+</html>

@@ -1,0 +1,810 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Discover your next favorite movie with our intelligent movie recommendation engine">
+    <meta name="keywords" content="movies, film recommendations, cinema, entertainment">
+    <link rel="shortcut icon" type="image/png" href="video-editing-app.png">
+    <title>Cinephile Junction | Movie Discovery Platform</title>
+    <style>
+         /* General Body Styles */
+         body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212; /* Dark background */
+            color: #e0e0e0; /* Light text */
+            min-height: 100vh;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Main Content */
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #1e1e1e; /* Dark container background */
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            text-align: left;
+            box-sizing: border-box;
+            margin: 20px auto;
+        }
+
+        /* Header Styles */
+        h1 {
+            font-size: 2.25rem;
+            font-weight: 600;
+            color: #00bcd4; /* Teal color for titles */
+            margin-bottom: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            text-align: center;
+        }
+
+        .description {
+    color:#555555;
+    margin-bottom: 2rem;
+    font-size: 1.2rem;
+    line-height: 1.8;
+    max-width: 800px;
+    margin: 30px auto;
+}
+
+        /* Filters Section */
+        .filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2rem;
+            margin-bottom: 3rem;
+        }
+
+        .filter-group {
+            flex: 1 1 calc(50% - 2rem);
+            min-width: 250px;
+        }
+
+        label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #00bcd4;
+            margin-bottom: 0.375rem;
+            display: block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        select, input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            font-size: 1rem;
+            border: 1px solid #333;
+            border-radius: 6px;
+            background-color: #333; /* Dark input background */
+            color: #e0e0e0; /* Light text color */
+            box-sizing: border-box;
+            transition: border-color 0.3s ease, background-color 0.3s ease;
+        }
+
+        select:focus, input:focus {
+            border-color: #00bcd4; /* Teal border on focus */
+            background-color: #444;
+            outline: none;
+        }
+
+        /* Button Style */
+        button {
+            background-color: #00bcd4; /* Teal color */
+            color: #fff;
+            padding: 1.25rem;
+            font-size: 1.125rem;
+            font-weight: 600;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+            transition: background-color 0.3s ease, transform 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0097a7; /* Darker teal on hover */
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            background-color: #00838f; /* Even darker teal on active */
+            transform: translateY(1px);
+        }
+
+        /* Movie Card Layout */
+        .movie-card {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            border-top: 1px solid #444;
+            padding-top: 20px;
+            padding-bottom: 20px;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .movie-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .movie-poster {
+            width: 250px;
+            height: 350px;
+            object-fit: cover;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .movie-details {
+            flex-grow: 1;
+            margin-left: 20px;
+            color: #e0e0e0; /* Light text color */
+        }
+
+        /* Movie Title */
+        .movie-details h2 {
+            font-size: 30px;
+            font-weight: bold;
+            margin: 0;
+            color: #00bcd4; /* Bright color for the title */
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Movie Year */
+        .movie-details p {
+            margin: 5px 0;
+            font-size: 16px;
+        }
+
+        /* Year Styling */
+        .movie-details .year {
+            color: #777; /* Light color for year */
+            font-size: 16px;
+        }
+
+        /* Rating Styling */
+        .movie-details .rating {
+            font-weight: bold;
+            color: #8bc34a; /* Green color for good ratings */
+            font-size: 18px;
+            margin-top: 10px;
+        }
+
+        /* Movie Description */
+        .movie-details .description {
+            font-size: 16px;
+            color: #555;
+            line-height: 1.6;
+            margin-top: 15px;
+        }
+
+        /* Trailer Section */
+        .trailer-container {
+            margin-top: 3rem;
+            text-align: center;
+            padding: 1.5rem 0;
+            background-color: #1a1a1a;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .trailer-container iframe {
+            width: 100%;
+            max-width: 80rem;
+            height: 29rem;
+            border: none;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Ultra-small device adjustments */
+        @media (max-width: 480px) {
+            .container {
+                padding: 0.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .filters {
+                flex-direction: column;
+            }
+
+            .filter-group {
+                flex: 1 1 100%;
+            }
+
+            .movie-card {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+
+            .movie-poster {
+                width: 22rem;
+                height: 33rem;
+            }
+
+            .movie-details {
+                margin-left: 0;
+                margin-top: 1.5rem;
+            }
+
+            .movie-details h2 {
+                font-size: 1.25rem;
+            }
+
+            .movie-details p {
+                font-size: 0.875rem;
+            }
+
+            .trailer-container iframe {
+                width: 100%;
+                height: 30rem;
+            }
+        }
+
+        footer {
+            background-color: #333;
+            color: white;
+            padding: 40px 20px;
+            margin-top: 40px;
+            font-size: 14px;
+        }
+
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .footer-section {
+            flex: 1 1 30%;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .footer-section h3 {
+            font-size: 18px;
+            margin-bottom: 15px;
+            color: #00bcd4;
+        }
+
+        .footer-links {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-links li {
+            margin: 10px 0;
+        }
+
+        .footer-links li a {
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s;
+        }
+
+        .footer-links li a:hover {
+            color: #167ac6;
+        }
+
+        .social-links a {
+            margin-right: 15px;
+            display: inline-block;
+            transition: transform 0.3s ease;
+        }
+
+        .social-links a:hover {
+            transform: scale(1.1);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 12px;
+            border-top: 1px solid #555;
+            padding-top: 10px;
+        }
+
+        .footer-bottom p {
+            margin: 0;
+        }
+
+        @media (max-width: 768px) {
+            .footer-section {
+                flex: 1 1 45%;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .footer-section {
+                flex: 1 1 100%;
+            }
+
+            .footer-content {
+                flex-direction: column;
+                align-items: center;
+            }
+        }
+
+        .slider-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 0.5rem;
+}
+
+.slider {
+    width: 100%;
+    height: 15px;
+    background-color: #333;
+    outline: none;
+    -webkit-appearance: none;
+    border-radius: 8px;
+}
+
+.slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 20px;
+    height: 20px;
+    background-color: #00bcd4;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    background-color: #00bcd4;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+#ratingValue {
+    font-size: 1rem;
+    font-weight: 500;
+    color: #00bcd4;
+    margin-left: 1rem;
+}
+
+.header {
+  background-color:#121212;
+  color: #fff;
+  padding: 10px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+}
+
+.user-name {
+  margin-right: 10px;
+  font-weight: bold;
+}
+
+.logout-btn {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  padding: 8px 12px;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.logout-btn:hover {
+  background-color: #e53935;
+}
+
+.profile-icon {
+  width: 40px;
+  height: 40px;
+  background-color: #00bcd4;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+  position: relative;
+}
+
+.profile-dropdown {
+  display: none;
+  position: absolute;
+  top: 100%;
+  right: 0;
+  background-color: #1e1e1e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  padding: 10px;
+  width: 200px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+  z-index: 10;
+}
+
+.profile-icon:hover .profile-dropdown {
+  display: block;
+}
+
+.profile-dropdown-content {
+  text-align: center;
+}
+
+.profile-dropdown-content p {
+  margin: 0 0 10px 0;
+  color: #00bcd4;
+}
+
+.spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #00bcd4; /* Teal color for spinner */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto;
+    margin-top: 30px;
+}
+
+/* Spinner animation */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+.admin-btn {
+  background-color: #00bcd4;
+  color: #fff;
+  border: none;
+  padding: 8px 0px;
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  width: 100%;
+  margin-bottom: 10px;
+  display: block;
+  text-align: center;
+}
+
+.admin-btn:hover {
+  background-color: #e53935;
+}
+    </style>
+</head>
+<body>
+
+    <header class="header">
+        <div class="profile-icon">
+            <span id="userInitial"></span>
+            <div class="profile-dropdown">
+              <div class="profile-dropdown-content">
+                <p id="welcomeMessage"></p>
+                <a href="admininfo.html" class="admin-btn">Manage User</a>
+                <button class="logout-btn">Logout</button>
+              </div>
+            </div>
+          </div>
+      </header>
+
+      <div class="user-info">
+        <span id="userInitial" class="user-initial"></span> <!-- User initial -->
+        <span id="welcomeMessage"></span> <!-- Welcome message -->
+    </div>
+
+    <div class="container">
+        <header>
+            <h1>Movie Discovery Engine</h1>
+            <p class="description">Discover your next cinematic adventure with our intelligent recommendation system. Select your preferences and let us guide you to your perfect movie match.</p>
+        </header>
+
+        <!-- Add the following spinner in the container -->
+<div id="loadingSpinner" class="spinner" style="display: none;"></div>
+
+
+        <div class="filters">
+            <div class="filter-group">
+                <label for="genreSelect">Genre</label>
+                <select id="genreSelect">
+                    <option value="">All Genres</option>
+                    <option value="Action">Action</option>
+                    <option value="Comedy">Comedy</option>
+                    <option value="Drama">Drama</option>
+                    <option value="Sci-Fi">Science Fiction</option>
+                    <option value="Horror">Horror</option>
+                    <option value="Adventure">Adventure</option>
+                </select>
+            </div>
+        
+            <div class="filter-group">
+                <label for="rating">Minimum Rating</label>
+                <div class="slider-container">
+                    <input type="range" min="0" max="10" value="7" step="0.5" class="slider" id="rating">
+                    <span id="ratingValue">7.0+</span>
+                </div>
+            </div>
+        </div>
+
+        <button onclick="findMovie()">Discover Movie</button>
+
+        <div id="result" style="display: none;">
+            <div class="movie-card">
+                <img id="moviePoster" src="" alt="Movie Poster" class="movie-poster">
+                <div class="movie-details">
+                    <h2 id="movieTitle"></h2>
+                    <p id="movieGenre"></p>
+                    <p id="movieYear"></p>
+                    <p id="movieRating" class="rating"></p>
+                    <p id="movieDescription"></p>
+                </div>
+            </div>
+
+            <div id="trailerContainer" class="trailer-container"></div>
+        </div>
+    </div>
+
+    <script>
+const MOVIES = [
+    // Action Movies
+    {
+        title: "KGF: Chapter 1",
+        genre: "Action",
+        year: 2018,
+        rating: 8.3,
+        poster: "kgf1.jpg",
+        description: "A young man's quest for power and wealth leads him from the streets of Mumbai to the gold mines of Kolar, where he becomes entangled in a dangerous world of crime and ambition.",
+        trailerUrl: "KGF Chapter 1.mp4"
+    },
+    {
+        title: "Salaga",
+        genre: "Action",
+        year: 2021,
+        rating: 7.2,
+        poster: "salaga.jpg",
+        description: "Set in the backdrop of North Bengaluru, the film follows the journey of a gangster named Salaga as he rises through the ranks of the criminal underworld.",
+        trailerUrl: "_SALAGA_  Official Teaser _ _SALAGA_ Kannada Movie _ Duniya Vijay _ Sanjana Anand _ Dhananjaya.mp4"
+    },
+    
+    // Comedy Movies
+    {
+        title: "Modalasala",
+        genre: "Comedy",
+        year: 2010,
+        rating: 7.5,
+        poster: "modalasala.jpg",
+        description: "A fun romantic comedy about college life and the adventures of engineering students, filled with humor and memorable characters.",
+        trailerUrl: "Modalasala.mp4"
+    },
+    {
+        title: "Rama Shama Bhama",
+        genre: "Comedy",
+        year: 2005,
+        rating: 7.8,
+        poster: "ramashamabhama.jpg",
+        description: "A hilarious tale of mistaken identity where a look-alike of a wealthy businessman creates chaos in the lives of everyone around.",
+        trailerUrl: "Rama Shama Bhama -.mp4"
+    },
+    
+    // Drama Movies
+    {
+        title: "Thithi",
+        genre: "Drama",
+        year: 2015,
+        rating: 8.2,
+        poster: "thithi.jpg",
+        description: "A dramatic comedy about three generations of men reacting to the death of their grandfather, set in a small village in Karnataka.",
+        trailerUrl: "https://www.youtube.com/embed/example3"
+    },
+    {
+        title: "Ulidavaru Kandanthe",
+        genre: "Drama",
+        year: 2014,
+        rating: 8.4,
+        poster: "ulidavarukandanthe.jpg",
+        description: "A neo-noir crime drama that tells the same story from different perspectives, set in the coastal town of Malpe.",
+        trailerUrl: "https://www.youtube.com/embed/example4"
+    },
+
+    // Science Fiction Movies
+    {
+        title: "Nanu Ki Jaanu",
+        genre: "Sci-Fi",
+        year: 2019,
+        rating: 7.1,
+        poster: "nanukijaanu.jpg",
+        description: "A science fiction thriller about a man who discovers mysterious phenomena in his apartment that leads him to uncover a larger conspiracy.",
+        trailerUrl: "https://www.youtube.com/embed/example5"
+    },
+    {
+        title: "Phone Bhoot",
+        genre: "Sci-Fi",
+        year: 2020,
+        rating: 7.3,
+        poster: "phonebhoot.jpg",
+        description: "A sci-fi comedy about a group of friends who develop a revolutionary communication device that leads to unexpected consequences.",
+        trailerUrl: "https://www.youtube.com/embed/example6"
+    },
+
+    // Horror Movies
+    {
+        title: "Nani",
+        genre: "Horror",
+        year: 2004,
+        rating: 7.4,
+        poster: "nani.jpg",
+        description: "A supernatural horror film about a possessed doll that terrorizes a family, blending traditional Karnataka folklore with modern horror elements.",
+        trailerUrl: "https://www.youtube.com/embed/example7"
+    },
+    {
+        title: "Aake",
+        genre: "Horror",
+        year: 2017,
+        rating: 7.0,
+        poster: "aake.jpg",
+        description: "A psychological horror thriller about a woman who experiences supernatural encounters that force her to confront her past.",
+        trailerUrl: "https://www.youtube.com/embed/example8"
+    },
+    
+    // Adventure Movies
+    {
+        title: "Vikrant Rona",
+        genre: "Adventure",
+        year: 2022,
+        rating: 7.6,
+        poster: "vikrantrona.jpg",
+        description: "An action-adventure about a police officer who arrives at a remote village in the Western Ghats to investigate mysterious disappearances.",
+        trailerUrl: "https://www.youtube.com/embed/example9"
+    },
+    {
+        title: "Pogaru",
+        genre: "Adventure",
+        year: 2021,
+        rating: 7.2,
+        poster: "pogaru.jpg",
+        description: "An adventurous journey of a rebellious young man who must navigate through various challenges while discovering his true purpose.",
+        trailerUrl: "https://www.youtube.com/embed/example10"
+    }
+];
+
+function findMovie() {
+    // Show loading spinner
+    document.getElementById('loadingSpinner').style.display = 'block';
+
+    // Hide the movie card if previously displayed
+    document.getElementById('result').style.display = 'none';
+
+    const genre = document.getElementById('genreSelect').value;
+    const minRating = parseFloat(document.getElementById('rating').value);
+
+    const filteredMovies = MOVIES.filter(movie =>
+        (genre === '' || movie.genre === genre) &&
+        movie.rating >= minRating
+    );
+
+    if (filteredMovies.length === 0) {
+        alert('No movies found matching your criteria. Try broader filters.');
+        document.getElementById('loadingSpinner').style.display = 'none'; // Hide loading spinner
+        return;
+    }
+
+    const selectedMovie = filteredMovies[Math.floor(Math.random() * filteredMovies.length)];
+
+    // Simulate a delay to show the loading spinner
+    setTimeout(() => {
+        document.getElementById('moviePoster').src = selectedMovie.poster;
+        document.getElementById('movieTitle').textContent = selectedMovie.title;
+        document.getElementById('movieGenre').textContent = `Genre: ${selectedMovie.genre}`;
+        document.getElementById('movieYear').textContent = `Year: ${selectedMovie.year}`;
+        document.getElementById('movieRating').textContent = `Rating: ${selectedMovie.rating}/10`;
+        document.getElementById('movieDescription').textContent = selectedMovie.description;
+
+        const trailerContainer = document.getElementById('trailerContainer');
+        trailerContainer.innerHTML = `
+            <h3>Watch the Trailer:</h3>
+            <video id="movieTrailer" width="100%" controls>
+                <source src="${selectedMovie.trailerUrl}" type="video/mp4">
+                Your browser does not support the video tag.
+            </video>
+        `;
+
+        // Hide the loading spinner and show the movie result
+        document.getElementById('loadingSpinner').style.display = 'none';
+        document.getElementById('result').style.display = 'block';
+    }, 1000); // Simulate a 1-second delay
+}
+
+const ratingSlider = document.getElementById('rating');
+const ratingValue = document.getElementById('ratingValue');
+
+ratingSlider.addEventListener('input', () => {
+    const value = ratingSlider.value;
+    ratingValue.textContent = `${value}+`;
+});
+
+// Get the user's name from the sign-up page (replace with your actual logic)
+const userName = localStorage.getItem('username');
+
+// Update user information on page load
+document.addEventListener('DOMContentLoaded', () => {
+    const userName = localStorage.getItem('username');
+    if (userName) {
+        // Set user initial
+        const userInitialElement = document.getElementById('userInitial');
+        if (userInitialElement) {
+            userInitialElement.textContent = getUserInitial(userName);
+        }
+
+        // Set welcome message
+        const welcomeMessageElement = document.getElementById('welcomeMessage');
+        if (welcomeMessageElement) {
+            welcomeMessageElement.textContent = `Hello, ${userName}!`;
+        }
+    }
+});
+
+// Logout functionality
+const logoutBtn = document.querySelector('.logout-btn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        // Clear the username from localStorage and redirect to the login page
+        localStorage.removeItem('username');
+        window.location.href = 'login.html';
+    });
+}
+
+// Function to get user's first initial
+function getUserInitial(username) {
+    return username ? username.charAt(0).toUpperCase() : '?';
+}
+
+    </script>
+<footer>
+    <div class="footer-content">
+        <div class="footer-section">
+            <h3>About Us</h3>
+            <p>We're passionate about helping movie lovers discover their next favorite film through our intelligent recommendation system.</p>
+        </div>
+        <div class="footer-section">
+            <h3>Quick Links</h3>
+            <ul class="footer-links">
+                <li><a href="main.html">Home</a></li>
+                <li><a href="#">Contact us</a></li>
+            </ul>
+        </div>
+        <div class="footer-section">
+            <h3>Connect With Us</h3>
+            <div class="social-links">
+                <a href="https://www.facebook.com/darshan.koti.503" target="_blank">
+                    <img src="facebook.svg" alt="Facebook" height="40px">
+                </a>
+                <a href="https://www.instagram.com/invites/contact/?igsh=17092pzcjzim&utm_content=p1inag0" target="_blank">
+                    <img src="instagram.svg" alt="Instagram" height="40px">
+                </a>
+            </div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2024 Cinephile Junction. All rights reserved.</p>
+    </div>
+</footer>
+
+</body>
+</html>

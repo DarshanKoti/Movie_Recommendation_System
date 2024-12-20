@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" type="image/png" href="video-editing-app.png">
+    <title>Admin Info | Cinephile Junction</title>
+    <style>
+        body {
+            font-family: 'Roboto', Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #121212;
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+
+        .header {
+            background-color: #1e1e1e;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .header h1 {
+            color: #00bcd4;
+            margin: 0;
+        }
+
+        .header-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .back-btn, .clear-all-btn {
+            background-color: #00bcd4;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            text-decoration: none;
+            transition: background-color 0.3s;
+        }
+
+        .clear-all-btn {
+            background-color: #f44336;
+        }
+
+        .back-btn:hover {
+            background-color: #0097a7;
+        }
+
+        .clear-all-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+
+        .stats-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background-color: #1e1e1e;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .stat-card h3 {
+            color: #00bcd4;
+            margin: 0 0 10px 0;
+        }
+
+        .stat-card p {
+            font-size: 24px;
+            margin: 0;
+            color: #fff;
+        }
+
+        .users-table {
+            width: 100%;
+            background-color: #1e1e1e;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .users-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .users-table th {
+            background-color: #00bcd4;
+            color: white;
+            text-align: left;
+            padding: 15px;
+        }
+
+        .users-table td {
+            padding: 15px;
+            border-bottom: 1px solid #333;
+        }
+
+        .users-table tr:hover {
+            background-color: #2a2a2a;
+        }
+
+        .delete-btn {
+            background-color: #f44336;
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #d32f2f;
+        }
+
+        .status-active {
+            color: #4caf50;
+        }
+
+        .status-inactive {
+            color: #f44336;
+        }
+
+        .search-bar {
+            margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .search-bar input {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #333;
+            border-radius: 4px;
+            background-color: #2a2a2a;
+            color: white;
+        }
+
+        .search-bar button {
+            padding: 10px 20px;
+            background-color: #00bcd4;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+        }
+
+        .search-bar button:hover {
+            background-color: #0097a7;
+        }
+        
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Admin Dashboard</h1>
+        <div class="header-buttons">
+            <button onclick="clearAllData()" class="clear-all-btn">Clear All Data</button>
+            <a href="admin.html" class="back-btn">Back to Main</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="stats-cards">
+            <div class="stat-card">
+                <h3>Total Users</h3>
+                <p id="totalUsers">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>Active Users</h3>
+                <p id="activeUsers">0</p>
+            </div>
+            <div class="stat-card">
+                <h3>New Users (Today)</h3>
+                <p id="newUsers">0</p>
+            </div>
+        </div>
+
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Search users...">
+            <button onclick="searchUsers()">Search</button>
+        </div>
+
+        <div class="users-table">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Email</th>
+                        <th>Sign Up Date</th>
+                        <th>Status</th>
+                        <th>Last Login</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="userTableBody">
+                    <!-- Table rows will be populated by JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        function getUsers() {
+            return JSON.parse(localStorage.getItem('users')) || [];
+        }
+
+        function saveUsers(users) {
+            localStorage.setItem('users', JSON.stringify(users));
+        }
+
+        function clearAllData() {
+            if (confirm('Are you sure you want to clear all user data?')) {
+                localStorage.removeItem('users');
+                updateStats();
+                displayUsers();
+            }
+        }
+
+        function deleteUser(email) {
+            if (confirm('Are you sure you want to delete this user?')) {
+                const users = getUsers();
+                const updatedUsers = users.filter(user => user.email !== email);
+                saveUsers(updatedUsers);
+                updateStats();
+                displayUsers();
+            }
+        }
+
+        function updateStats() {
+            const users = getUsers();
+            const activeUsers = users.filter(user => user.status === 'active').length;
+            const today = new Date().toDateString();
+            const newUsers = users.filter(user => new Date(user.signUpDate).toDateString() === today).length;
+
+            document.getElementById('totalUsers').textContent = users.length;
+            document.getElementById('activeUsers').textContent = activeUsers;
+            document.getElementById('newUsers').textContent = newUsers;
+        }
+
+        function displayUsers(users = getUsers()) {
+            const tableBody = document.getElementById('userTableBody');
+            tableBody.innerHTML = '';
+
+            users.forEach(user => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${user.username}</td>
+                    <td>${user.email}</td>
+                    <td>${new Date(user.signUpDate).toLocaleDateString()}</td>
+                    <td class="status-${user.status}">${user.status}</td>
+                    <td>${new Date(user.lastLogin).toLocaleString()}</td>
+                    <td><button onclick="deleteUser('${user.email}')" class="delete-btn">Delete</button></td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function searchUsers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const users = getUsers();
+            const filteredUsers = users.filter(user => 
+                user.username.toLowerCase().includes(searchTerm) ||
+                user.email.toLowerCase().includes(searchTerm)
+            );
+            displayUsers(filteredUsers);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateStats();
+            displayUsers();
+        });
+
+        document.getElementById('searchInput').addEventListener('keyup', searchUsers);
+    </script>
+</body>
+</html>
